@@ -14,7 +14,7 @@
   ],
   "functions": {
     "app.js": {
-      "includeFiles": ["views/**", "public/**", "routes/**", "utils/**"]
+      "includeFiles": "**"
     }
   }
 }
