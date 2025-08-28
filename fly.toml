@@ -1,34 +1,22 @@
-# fly.toml app configuration file generated for lyz05-danmaku on 2024-01-11T19:54:43+08:00
+# fly.toml app configuration file generated for danmaku on 2025-08-28T05:22:28Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "lyz05-danmaku"
-primary_region = "sea"
-kill_signal = "SIGINT"
-kill_timeout = "5s"
-
-[experimental]
-  auto_rollback = true
+app = 'danmaku'
+primary_region = 'hkg'
 
 [build]
 
-[env]
-  PORT = "8080"
-
 [http_service]
-  internal_port = 8080
+  internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
 [[vm]]
-  cpu_kind = "shared"
+  cpu_kind = 'shared'
   cpus = 1
   memory_mb = 512
-
-[mounts]
-  source="danmaku"
-  destination="/app/db"
