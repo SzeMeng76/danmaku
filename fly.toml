@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "lyz05-danmaku"
+app = "danmaku"
 primary_region = "sea"
 kill_signal = "SIGINT"
 kill_timeout = "5s"
