@@ -32,6 +32,7 @@ specifiers:
   nodemon: ^2.0.20
   nyc: ^15.1.0
   openai: ^3.2.1
+  p-limit: ^3.1.0
   pako: ^1.0.11
   querystring: ^0.2.1
   whacko: ^0.19.1
@@ -64,6 +65,7 @@ dependencies:
   node-cron: 3.0.3
   node-telegram-bot-api: 0.60.0
   openai: 3.3.0_debug@4.3.4
+  p-limit: 3.1.0
   pako: 1.0.11
   querystring: 0.2.1
   whacko: 0.19.1
@@ -3151,7 +3153,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yocto-queue: 0.1.0
-    dev: true
+    dev: false
 
   /p-locate/4.1.0:
     resolution: {integrity: sha512-R79ZZ/0wAxKGu3oYMlz8jy/kbhsNrS7SKZ7PxEHBgJ5+F2mtFW2fK2cOtBh1cHYkQsbzFV7I+EoRKe6Yt0oK7A==}
@@ -4403,7 +4405,7 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-    dev: true
+    dev: false
 
   registry.npmmirror.com/debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/debug/-/debug-2.6.9.tgz}
