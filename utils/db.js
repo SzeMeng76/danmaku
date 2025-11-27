@@ -9,10 +9,10 @@ if (dbConnected) {
     sqlite3.OPEN_READWRITE,
     function (err) {
       if (err) {
-        console.log(err.message);
+        console.log("sqlite:", err.message);
         dbConnected = false; // 更新连接状态
       } else {
-        console.log('Connected to the database successfully');
+        console.log('sqlite: Connected to the database successfully');
       }
     }
   );
@@ -55,7 +55,7 @@ async function errorInsert(record) {
     );
     return rows;
   } catch (err) {
-    console.error('Error during data insertion:', err.message);
+    console.error('sqlite: Error during data insertion:', err.message);
   }
 }
 
@@ -67,7 +67,7 @@ async function accessInsert(record) {
     );
     return rows;
   } catch (err) {
-    console.error('Error during data insertion:', err.message);
+    console.error('sqlite: Error during data insertion:', err.message);
   }
 }
 
@@ -77,7 +77,7 @@ async function accessCountQuery() {
     const ret = await all("SELECT * FROM AccessStatistics");
     return ret[0];
   } catch (err) {
-    console.error('Error during data query:', err.message);
+    console.error('sqlite: Error during data query:', err.message);
     return {'today_visited': "null", 'lastday_visited': "null", 'month_visited': "null"};
   }
 }
@@ -90,7 +90,7 @@ async function videoInfoInsert(record) {
     );
     return rows;
   } catch (err) {
-    console.error('Error during data insertion:', err.message);
+    console.error('sqlite: Error during data insertion:', err.message);
   }
 }
 
@@ -99,7 +99,7 @@ async function hotlistQuery() {
   try {
     return await all("SELECT * FROM YesterdayHotlist;");
   } catch (err) {
-    console.error('Error during data query:', err.message);
+    console.error('sqlite: Error during data query:', err.message);
     return null;
   }
 }
@@ -117,32 +117,32 @@ async function deleteAccess() {
     changes += result.changes;
     // vacuum
     await run("vacuum");
-    console.log("deleteAccess Affect Rows:",changes)
+    console.log("sqlite: deleteAccess Affect Rows:",changes)
     return changes; // 提取删除的行数
   } catch (err) {
-    console.error('Error during data deletion:', err.message);
+    console.error('sqlite: Error during data deletion:', err.message);
     return null;
   }
 }
 
-async function main() {
-  const ret = await deleteAccess();
-  console.log(ret);
-}
+// async function main() {
+//   const ret = await deleteAccess();
+//   console.log(ret);
+// }
 
-if (!module.parent) {
-  accessInsert({
-    'ip': '127.0.0.1',
-    'url': 'https://www.mgtv.com/b/336727/8087768.html',
-    'UA': 'PostmanRuntime/7.37.3'
-  });
+// if (!module.parent) {
+//   accessInsert({
+//     'ip': '127.0.0.1',
+//     'url': 'https://www.mgtv.com/b/336727/8087768.html',
+//     'UA': 'PostmanRuntime/7.37.3'
+//   });
 
-  videoInfoInsert({
-    'url': 'https://www.mgtv.com/b/336727/8087768.html',
-    'title': '婚前21天'
-  });
+//   videoInfoInsert({
+//     'url': 'https://www.mgtv.com/b/336727/8087768.html',
+//     'title': '婚前21天'
+//   });
 
-  main();
-}
+//   main();
+// }
 
 module.exports = { errorInsert, accessInsert, accessCountQuery, videoInfoInsert, hotlistQuery, deleteAccess };

@@ -1,18 +1,10 @@
-const express = require("express");
-const axios = require("axios");
+import express from "express";
+import axios from "axios";
+import { createSourceList } from "./sources.mjs";
+import db from "../utils/db.js";
+
 const router = express.Router();
-const URL = require("url");
-const {
-	bilibili,
-	mgtv,
-	tencentvideo,
-	youku,
-	iqiyi,
-	gamer,
-} = require("./api/base");
-const list = [bilibili, mgtv, tencentvideo, youku, iqiyi, gamer];
-const memory = require("../utils/memory");
-const db = require("../utils/db");
+const list = createSourceList();
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
 // 返回对象{msg: "ok", title: "标题", content: []}
@@ -27,9 +19,9 @@ async function build_response(url, req) {
 			maxRedirects: 10
 		});
 		url = response.request.res.responseUrl || url;
-        console.log("Real url:", url);
+        console.log("重定向后最终URL:", url);
 	} catch (e) {
-		console.log(e);
+		console.log("尝试打开传入页面失败" + e.message);
 		// 如果是 403 错误，不报错，继续执行
 		if (e.response && e.response.status === 403) {
 			console.log("访问视频页面 403 错误，有可能被防火墙拦了");
@@ -53,7 +45,7 @@ async function build_response(url, req) {
 	try {
 		ret = await fc.work(url);
 	} catch (e) {
-		console.log(e);
+		console.log("全局错误捕获，详情查阅数据库", e);
 		let err = JSON.stringify(e, Object.getOwnPropertyNames(e));
 		db.errorInsert({
 			ip: req.ip,
@@ -69,7 +61,6 @@ async function resolve(req, res) {
 	const url = req.query.url;
 	const download = (req.query.download === "on");
 	const ret = await build_response(url, req);
-	memory(); //显示内存使用量
 	if (ret.msg !== "ok") {
 		res.status(403).send(ret.msg);
 		return;
@@ -81,10 +72,11 @@ async function resolve(req, res) {
 	// 记录视频信息
 	db.videoInfoInsert({url,title:ret.title})
 	//B站视频，直接重定向
-	if (ret.url)
+	if (ret.url) {
 		res.redirect(ret.url);
-	else {
-		res.set('Cache-Control', 'public, max-age=86400'); // one year
+	} else {
+		console.log("标题：", ret.title, "弹幕数量:", ret.content.length);
+		// res.set('Cache-Control', 'public, max-age=86400'); // 缓存一天
 		res.render("danmaku-xml", { contents: ret.content });
 	}
 }
@@ -94,17 +86,26 @@ async function index(req, res) {
 	const names = list.map(item => item.name);
 	const domains = list.map(item => item.domain);
 	const path = req.protocol + "://" + req.headers.host + req.originalUrl;
-	const resolve_info = await db.accessCountQuery()
-	const hotlist = await db.hotlistQuery()
 	res.render("danmaku", {
 		path,
 		urls,
 		names,
 		domains,
-		resolve_info,
-		hotlist
 	});
 }
+
+router.get("/api/home-data", async (req, res) => {
+    try {
+        const [resolve_info, hotlist] = await Promise.all([
+            db.accessCountQuery(),
+            db.hotlistQuery()
+        ]);
+        res.json({ resolve_info, hotlist });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "查询失败" });
+    }
+});
 
 /* GET home page. */
 router.get("/", async function (req, res) {
@@ -122,4 +123,5 @@ router.get("/delete", async function (req, res) {
 	res.send(`成功请求删除三个月以前的记录，删除情况请查看日志`);
 });
 
-module.exports = router;
+// module.exports = router;
+export default router;
