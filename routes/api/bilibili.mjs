@@ -11,7 +11,8 @@ export default class BilibiliSource extends BaseSource {
 			"https://www.bilibili.com/video/av170001",
 			"https://www.bilibili.com/video/av170001?p=2",
 			"https://www.bilibili.com/video/BV17x411w7KC?p=3",
-			"https://www.bilibili.com/bangumi/play/ep691614"
+			"https://www.bilibili.com/bangumi/play/ep691614",
+            "https://www.bilibili.com/bangumi/play/ep2636828"
 		];
 	}
 
@@ -51,6 +52,7 @@ export default class BilibiliSource extends BaseSource {
 				this.error_msg = "获取番剧视频信息失败！";
 				return;
 			}
+            // 正片内容
 			for (let i = 0; i < response.data.result.episodes.length; i++) {
 				if (response.data.result.episodes[i].id == params.ep_id) {
 					this.title = response.data.result.episodes[i].share_copy;
@@ -58,6 +60,19 @@ export default class BilibiliSource extends BaseSource {
 					return [`https://comment.bilibili.com/${cid}.xml`];
 				}
 			}
+            // 花絮、PV、番外等非正片内容
+            if (Array.isArray(response.data.result.section)) {
+                for (let j = 0; j < response.data.result.section.length; j++) {
+                    for (let i = 0; i < response.data.result.section[j].episodes.length; i++) {
+                        if (response.data.result.section[j].episodes[i].id == params.ep_id) {
+                            this.title = response.data.result.section[j].episodes[i].share_copy;
+                            const cid = response.data.result.section[j].episodes[i].cid;
+                            return [`https://comment.bilibili.com/${cid}.xml`];
+                        }
+                    }
+                }
+            }
+			this.error_msg = "未找到对应的番剧视频信息！";
 		} else {
 			this.error_msg = "不支持的B站视频网址，仅支持普通视频(av,bv)、剧集视频(ep)";
 		}
